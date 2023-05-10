@@ -1,6 +1,5 @@
 use std::{collections::HashMap, ffi::OsStr, path::Path};
 use lazy_static::lazy_static;
-use serde_json::value;
 use worker::*;
 use markdown;
 
@@ -38,13 +37,22 @@ fn get_mime(ext: &str) -> &'static str {
 }
 
 pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> {
-	let asset = _ctx.param("tttt").map(String::as_str).unwrap_or("index.html");
+  let storage = _ctx.kv("BLOG_POSTS").unwrap();
+  let keys = storage.list().execute().await.unwrap().keys;
+  let mut posts: Vec<String> = vec![];
+
+  for (index, value) in keys.iter().enumerate() {
+    posts.insert(index, markdown::to_html(storage.get(value.name.as_str()).text().await.unwrap().unwrap().as_str())) 
+  };
+
+  console_log!("{:?}", posts);
+
+  let asset = _ctx.param("tttt").map(String::as_str).unwrap_or("index.html");
   let extension = Path::new(asset)
     .extension()
     .unwrap_or(OsStr::new("html"))
     .to_string_lossy()
     .into_owned();
-
 	let mut headers = Headers::new();
 	let mime_type = get_mime(extension.as_str());
 	headers.set("Content-Type", mime_type).unwrap();
@@ -57,21 +65,34 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
         Ok(Response::from_bytes(asset_raw.to_vec())?.with_headers(headers))
       },
       AssetType::Str(asset_raw) => {
-        Ok(Response::ok(asset_raw.to_owned())?.with_headers(headers))
-      }
-    }
-  } else {
-    let storage = _ctx.kv("KV_FROM_RUST").unwrap();
-    let asset_raw = storage.get(asset).text().await;
+        if asset == "index.html" {
+          let mut posts_final = String::new();
 
-    match asset_raw {
-      Ok(value) => {
-        let post = value.unwrap();
-        Ok(Response::ok(markdown::to_html(post.as_str()))?.with_headers(headers))
-      },
-      _ => {
-        Response::error("Not Found", 404)
+          for s in &posts {
+            posts_final.push_str(s)
+          }
+
+          Ok(Response::ok(asset_raw.replace("<!-- BLOG_POSTS -->", &posts_final))?.with_headers(headers))
+        } else {
+          Ok(Response::ok(asset_raw.to_owned())?.with_headers(headers))
+        }
+        
       }
     }
+  } else { 
+    Response::error("Not Found", 404) 
   }
+ 
+    // let asset_raw = storage.get(asset).text().await;
+
+    // match asset_raw {
+    //   Ok(value) => {
+    //     let post = value.unwrap();
+    //     Ok(Response::ok(markdown::to_html(post.as_str()))?.with_headers(headers))
+    //   },
+    //   _ => {
+    //     Response::error("Not Found", 404)
+    //   }
+    // }
+  
 }

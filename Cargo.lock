@@ -38,7 +38,6 @@ dependencies = [
  "lazy_static",
  "markdown",
  "serde_json",
- "url",
  "worker",
  "worker-kv 0.6.0",
 ]

@@ -1,13 +1,9 @@
 name = "blogrs"
 main = "build/worker/shim.mjs"
 compatibility_date = "2022-01-20"
-#account_id = ""
-#workers_dev = true
-#route = ""
-#zone_id = ""
 
 kv_namespaces = [
-  { binding = "KV_FROM_RUST", id = "1a39141fbbf04cd8965f80b8afa59ba8", preview_id = "9a7bb174693646328c31a0831bf1c2d1" }
+  { binding = "BLOG_POSTS", id = "e619482f39ce459599f51b1eaf5be9a9", preview_id = "b12e2b9700ba4a39b3a8c84033e3031b" }
 ]
 
 [vars]

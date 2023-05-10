@@ -11,6 +11,10 @@ html, body {
   font-size: 16px;
 }
 
+.blog_posts {
+  margin-left: 7px;
+}
+
 .hostname {
   color: #ffffff;
 }
