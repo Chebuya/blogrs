@@ -1,6 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ffi::OsStr, path::Path};
 use lazy_static::lazy_static;
+use serde_json::value;
 use worker::*;
+use markdown;
 
 #[derive(Debug)]
 enum AssetType<'a> {
@@ -18,13 +20,7 @@ lazy_static! {
   };
 }
 
-fn get_mime(path: &str) -> &'static str {
-	let ext = if let Some((_, ext)) = path.rsplit_once(".") {
-		ext
-	} else {
-		return "text/plain";
-	};
-
+fn get_mime(ext: &str) -> &'static str {
 	let mime_type = match ext {
 		"html" => "text/html",
 		"css" => "text/css",
@@ -43,18 +39,39 @@ fn get_mime(path: &str) -> &'static str {
 
 pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> {
 	let asset = _ctx.param("tttt").map(String::as_str).unwrap_or("index.html");
+  let extension = Path::new(asset)
+    .extension()
+    .unwrap_or(OsStr::new("html"))
+    .to_string_lossy()
+    .into_owned();
+
 	let mut headers = Headers::new();
-	let mime_type = get_mime(asset);
+	let mime_type = get_mime(extension.as_str());
 	headers.set("Content-Type", mime_type).unwrap();
 
-  let body_raw = ASSETS.get(asset).unwrap();
+  if ASSETS.contains_key(asset) {
+    let asset_raw = ASSETS.get(asset).unwrap();
 
-  match body_raw {
-    AssetType::Bytes(asset) => {
-      Ok(Response::from_bytes(asset.to_vec())?.with_headers(headers))
-    },
-    AssetType::Str(asset) => {
-      Ok(Response::ok(asset.to_owned())?.with_headers(headers))
+    match asset_raw {
+      AssetType::Bytes(asset_raw) => {
+        Ok(Response::from_bytes(asset_raw.to_vec())?.with_headers(headers))
+      },
+      AssetType::Str(asset_raw) => {
+        Ok(Response::ok(asset_raw.to_owned())?.with_headers(headers))
+      }
+    }
+  } else {
+    let storage = _ctx.kv("KV_FROM_RUST").unwrap();
+    let asset_raw = storage.get(asset).text().await;
+
+    match asset_raw {
+      Ok(value) => {
+        let post = value.unwrap();
+        Ok(Response::ok(markdown::to_html(post.as_str()))?.with_headers(headers))
+      },
+      _ => {
+        Response::error("Not Found", 404)
+      }
     }
   }
 }
