@@ -2,81 +2,33 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Green-Gray Themed Blog</title>
-    <style>
-      /* TO_REPLACE */
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>awwwwwww</title>
+    <link rel="icon" href="./favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <meta name="color-scheme" content="dark">
   </head>
   <body>
-    <div id="contentttt"></div>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <h3 id="user">chebuya@<span id="hostname">localhost</span> ~<span id="arrow">> cat /etc/about-me</span></h3>
+    <img id="boymoder" src="boymoder.png" alt="Boymoder">
+    <div id="about_me">Sad and lazy self-taught and extremely bedpilled boymoder
+Transfem non-binary (she/her 🏳️‍⚧️)
+Currently living in Russia (Moscow)
+Discord: Chebuya#0604
+    </div>
     <script>
-      document.getElementById('contentttt').innerHTML =
-      marked.parse(`# Laevaque sed redit
+        const head = document.querySelector('head');
 
-## Precando pinus Arethusa frigora in currum faciem
+        function handleMutation() {
+          const darkreaderSelector = 'meta[name="darkreader"]';
+          if (head.querySelector(darkreaderSelector)) {
+            document.body.style.background = "none";
+          };
+        };
 
-Lorem markdownum fides, adspice et plagae disiecit poena. Qui huius Iovi, quae
-tuentes suos pro ab vacat. Puduit iras genitore tectis inpedienda agnorunt neque
-Eurylochum viros.
-
-> Care est clamor interea? Vota lustrat aderat cum quam. Est duorum et isse non
-> interiit cani; loco magnus credidit, dum fugit arva freto.
-
-## Orbem inane erit pectora digitosque dextra dicere
-
-Opto Minyis. Liriope tu quae haeret huic, brevissima rustica medullas litora:
-populo **una veniam** erigitur caruisse Caicus. Ipsam puerum amasse sequitur
-levem. Cava vix adeo mentem?
-
-    dvd_yobibyte.degaussShell = installTextSdk;
-    var microcomputer_commercial_name = 3 + grayscale.recursiveBare(
-            nybble_flood_only);
-    retina_troll_trash.ieeeCross = configurationHdd;
-    pdfGigabyteSystem(opticalPython + eps, 89 - isaCrt + acl, apache);
-
-## Terrae in aetheriis sanguine Pindo
-
-Cytherea quae vulnera, et est cantu firmat fieretque *mansit*, templis dextera!
-Tollere vulneribus caput, eas reddunt [ornum
-summoque](http://urbes-et.net/sunthac) vulgarunt facientes, epulae retro, **tuam
-velatam**.
-
-<img src="https://i.imgur.com/tWYDQP7.jpeg" alt="momoma" style="width: 200px;">
-
-> Ac **non**, semper curis, ipse dat iam fraxinus galea moves cum. Et licet
-> Iuppiter pervia, ebur nutrici anguem venabula animo manus, Cancrum nitebant.
-> Et ortu Iuppiter prendere recipit, suas metum temperat, tollit aut prospicit
-> sortem, moriens. Terrae et ecce genetrice tempus mortis inque annosae aure
-> meque, iura hoc mihi petita, in.
-
-Est ego iactatis caduca ripa inmunis **non**! Vertice non quod Iuno sit **cum
-tellus**, Almo quod? Bracchia tantis Iove Ledam iniuste [altoque
-ni](http://www.sed-gerunt.org/) narrat, celeberrimus quae virginea simul. Pati
-**differt** artus, est pete ut, sororum Baucis; Curibus validos et.
-
-      `);
+        handleMutation();
+        
+        new MutationObserver(handleMutation).observe(head, { childList: true });
     </script>
-    <!-- <div class="header">
-      <h1>Green-Gray Themed Blog</h1>
-    </div>
-    <div class="content">
-      <article>
-        <h2>First Blog Post</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi consectetur aliquet turpis, eget rhoncus diam lobortis et. Aenean mattis dolor eget libero elementum, a semper velit aliquet. Nunc bibendum lacinia nunc, non tristique dolor egestas non. Cras a arcu vel elit pharetra ultricies. In facilisis, dui eu pharetra fermentum, libero enim mollis lorem, eu consectetur leo orci non odio. Donec bibendum aliquet nisl ac pretium. Integer eu magna in sapien pulvinar bibendum sed eget ante. Integer rhoncus eu felis non dictum.
-        </p>
-      </article>
-      <article>
-        <h2>Second Blog Post</h2>
-        <p>Etiam Mauris velit, sagittis at augue quis, vehicula dictum orci. Mauris sollicitudin congue enim, eget scelerisque nisl malesuada quis. Aliquam mollis lacus id quam dictum congue. Aliquam dictum nisi nec eros venenatis commodo. Quisque auctor vestibulum augue a gravida. Pellentesque blandit ipsum dictum urna rhoncus, ut auctor dui suscipit. Duis vel scelerisque magna, ut tempor mi. Morbi sit amet venenatis metus. Fusce vel odio dapibus, eleifend magna a, pulvinar lacus. Fusce facilisis sapien quam. Cras ultrices nec quam at tincidunt. Donec eget malesuada lectus.</p>
-      </article>
-      <article>
-        <h2>Third Blog Post</h2>
-        <p>Donec luctus, est eu vestibulum euismod, felis metus blandit lorem, quis lobortis ipsum ante sit amet magna. Fusce auctor tortor magna, sed consectetur nisi hendrerit vel. Sed imperdiet eget sapien id tincidunt. Nullam sapien magna, tristique at congue et, bibendum vitae urna. Cras molestie gravida magna, nec dictum dolor semper eu. Maecenas ante elit, pretium euismod massa sit amet, blandit bibendum justo. Nunc euismod urna sed vestibulum consequat.</p>
-      </article>
-    </div>
-    <div class="footer">
-      <p>Green-Gray Themed Blog &copy; 2021</p>
-    </div> -->
   </body>
 </html>
