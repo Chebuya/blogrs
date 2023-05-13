@@ -40,7 +40,6 @@ body {
 
 .post a {
   text-decoration: none;
-  color: white;
 }
 
 .date {
@@ -70,7 +69,6 @@ body {
 #resources a {
   color: white;
   text-decoration: none;
-  font-size: 24px
 }
 
 @media only screen and (max-width: 600px) {

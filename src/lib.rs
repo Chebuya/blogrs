@@ -1,7 +1,7 @@
-// use worker::{ *, worker_sys::{ response, request_init }, wasm_bindgen::{JsValue, UnwrapThrowExt} };
 use worker::*;
 mod asset;
 mod utils;
+mod blog;
 
 // fn log_request(req: &Request) {
 // 	console_log!(
