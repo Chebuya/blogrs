@@ -72,8 +72,8 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 		}
 	} else {
 		if asset == "login" {
-      headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
-      Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
+        headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
+        Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
     } else {
 			Response::error("Not Found", 404)
 		}
