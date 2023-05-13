@@ -16,7 +16,7 @@ lazy_static! {
       m.insert(String::from("index.html"), AssetType::Str(include_str!("../html/index.html")));
       m.insert(String::from("style.css"), AssetType::Str(include_str!("../html/style.css")));
       m.insert(String::from("avatar.png"), AssetType::Bytes(include_bytes!("../html/avatar.png")));
-	  m.insert(String::from("boymoder.png"), AssetType::Bytes(include_bytes!("../html/boymoder.png")));
+    m.insert(String::from("boymoder.png"), AssetType::Bytes(include_bytes!("../html/boymoder.png")));
       m
   };
 }
@@ -48,7 +48,6 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 	let mut headers = Headers::new();
 	let mime_type = get_mime(extension.as_str());
 	headers.set("Content-Type", mime_type).unwrap();
-	console_log!("mda {:?}", _req.path());
 
 	if ASSETS.contains_key(asset) {
 		let asset_raw = ASSETS.get(asset).unwrap();
@@ -61,17 +60,22 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 				if asset == "index.html" {
 					Ok(
 						Response::ok(
-							asset_raw.to_owned().replace("<!-- BLOG_POSTS -->", get_all_posts(&_ctx).await.as_str())
+							asset_raw
+								.to_owned()
+								.replace("<!-- BLOG_POSTS -->", get_all_posts(&_ctx).await.as_str())
 						)?.with_headers(headers)
 					)
-				if asset == "login" {
-					headers.set("Authorization", "Basic")
-				} else if  {
+				} else {
 					Ok(Response::ok(asset_raw.to_owned())?.with_headers(headers))
 				}
 			}
 		}
 	} else {
-		Response::error("Not Found", 404)
+		if asset == "login" {
+      headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
+      Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
+    } else {
+			Response::error("Not Found", 404)
+		}
 	}
 }
