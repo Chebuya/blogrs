@@ -1,5 +1,6 @@
 use std::{ collections::HashMap, ffi::OsStr, path::Path };
 use lazy_static::lazy_static;
+use base64;
 use worker::*;
 
 use crate::blog::get_all_posts;
@@ -10,13 +11,15 @@ enum AssetType<'a> {
 	Str(&'a str),
 }
 
+static AUTH: &str = include_str!("/run/agenix/blogrs");
+
 lazy_static! {
   static ref ASSETS: HashMap<String, AssetType<'static>> = {
       let mut m = HashMap::new();
       m.insert(String::from("index.html"), AssetType::Str(include_str!("../html/index.html")));
       m.insert(String::from("style.css"), AssetType::Str(include_str!("../html/style.css")));
       m.insert(String::from("avatar.png"), AssetType::Bytes(include_bytes!("../html/avatar.png")));
-    m.insert(String::from("boymoder.png"), AssetType::Bytes(include_bytes!("../html/boymoder.png")));
+      m.insert(String::from("boymoder.png"), AssetType::Bytes(include_bytes!("../html/boymoder.png")));
       m
   };
 }
@@ -38,6 +41,7 @@ fn get_mime(ext: &str) -> &'static str {
 	mime_type
 }
 
+#[allow(deprecated)]
 pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> {
 	let asset = _ctx.param("tttt").map(String::as_str).unwrap_or("index.html");
 	let extension = Path::new(asset)
@@ -72,10 +76,28 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 		}
 	} else {
 		if asset == "login" {
-        headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
-        Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
+			if _req.headers().has("Authorization").unwrap() {
+				let credentials = String::from_utf8(
+					base64
+						::decode(_req.headers().get("Authorization").unwrap().unwrap().replace("Basic ", ""))
+						.unwrap()
+				).unwrap();
+
+				console_log!("{}|{}", AUTH.replace("\n", ""), credentials);
+				if credentials == AUTH.replace("\n", "") {
+					Response::ok("Authorized")
+				} else {
+					headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
+					Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
+				}
+			} else {
+				headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
+				Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
+			}
+		} else if asset == "post" {
+      // todo
     } else {
-			Response::error("Not Found", 404)
+      Response::error("Not Found", 404)
 		}
 	}
 }
