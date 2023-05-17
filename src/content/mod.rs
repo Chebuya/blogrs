@@ -12,6 +12,7 @@ enum AssetType<'a> {
 
 static AUTH: &str = include_str!("/run/agenix/blogrs");
 static POST: &str = include_str!("../../html/post.html");
+static EDITOR: &str = include_str!("../../html/editor.html");
 
 lazy_static! {
   static ref ASSETS: HashMap<String, AssetType<'static>> = {
@@ -76,7 +77,7 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 			}
 		}
 	} else {
-		if asset == "login" {
+		if asset == "editor" {
 			if _req.headers().has("Authorization").unwrap() {
 				let credentials = String::from_utf8(
 					base64
@@ -86,7 +87,7 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 
 				console_log!("{}|{}", AUTH.replace("\n", ""), credentials);
 				if credentials == AUTH.replace("\n", "") {
-					Response::ok("Authorized")
+					Response::ok(EDITOR)
 				} else {
 					headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
 					Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
@@ -96,15 +97,13 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 				Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
 			}
 		} else {
-			let post = _ctx.kv("BLOG_POSTS").unwrap().get(asset).text().await;
-      match blog::get_post(&asset.to_string(), &_ctx.kv("BLOG_POSTS").unwrap()).await {
-        Some(value) => {
-          Ok(Response::ok(POST.replace("<!-- POST -->", value.3.as_str()))?.with_headers(headers))
-        },
-        None => {
-          Response::error("Not found", 404)
-        }
-      }
+			// let post = _ctx.kv("BLOG_POSTS").unwrap().get(asset).text().await;
+			match blog::get_post(&asset.to_string(), &_ctx.kv("BLOG_POSTS").unwrap()).await {
+				Some(value) => {
+					Ok(Response::ok(POST.replace("<!-- POST -->", value.3.as_str()))?.with_headers(headers))
+				}
+				None => { Response::error("Not found", 404) }
+			}
 		}
 	}
 }
