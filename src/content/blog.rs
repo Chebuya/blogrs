@@ -48,7 +48,7 @@ pub async fn get_all_posts(context: &RouteContext<()>) -> String {
 
     posts.push_str(r#"
 <div class="post">
-  <a href="https://cosmetics-safety-name-assets.trycloudflare.com/TITLE">
+  <a href="https://localhost:8787/post/TITLE">
     <strong>
       SHORT_DESC
     </strong>

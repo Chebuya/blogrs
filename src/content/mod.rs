@@ -1,6 +1,7 @@
 use std::{ collections::HashMap, ffi::OsStr, path::Path };
 use lazy_static::lazy_static;
 use base64;
+use serde_json::value;
 use worker::*;
 mod blog;
 
@@ -87,7 +88,7 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 
 				console_log!("{}|{}", AUTH.replace("\n", ""), credentials);
 				if credentials == AUTH.replace("\n", "") {
-					Response::ok(EDITOR)
+					Ok(Response::ok(EDITOR)?.with_headers(headers))
 				} else {
 					headers.set("WWW-Authenticate", "Basic realm=\"example\"").unwrap();
 					Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
@@ -97,13 +98,26 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 				Ok(Response::error("Unauthorized", 401)?.with_headers(headers))
 			}
 		} else {
-			// let post = _ctx.kv("BLOG_POSTS").unwrap().get(asset).text().await;
-			match blog::get_post(&asset.to_string(), &_ctx.kv("BLOG_POSTS").unwrap()).await {
+			Response::error("Not found", 404)
+		}
+	}
+}
+
+pub async fn serve_post(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> {
+	let asset = _ctx.param("bbbb").map(String::as_str);
+	let mut headers = Headers::new();
+	headers.set("Content-Type", "text/html").unwrap();
+  console_log!("{:?}", asset);
+
+	match asset {
+		Some(value) => {
+			match blog::get_post(&value.to_string(), &_ctx.kv("BLOG_POSTS").unwrap()).await {
 				Some(value) => {
 					Ok(Response::ok(POST.replace("<!-- POST -->", value.3.as_str()))?.with_headers(headers))
 				}
 				None => { Response::error("Not found", 404) }
 			}
 		}
+		_ => { Response::error("Not found", 404) }
 	}
 }
