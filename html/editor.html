@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <title>Markdown Editor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+  <style>
+    html, body {
+      background: #181a1b;
+      font-family: monospace;
+      margin: 0;
+      scrollbar-width: none;
+    }
+
+    #editorInput,
+    #lineCounter {
+      margin: 0;
+      resize: none;
+      font-size: 16px;
+      box-sizing: border-box;
+      border: none;
+    }
+
+    #editorContainer {
+      display: flex;
+      flex-direction: row;
+      scrollbar-width: none;
+    }
+
+    #editorInput {
+      padding-left: 3rem;
+      /* margin-right: 2.5%; */
+      width: 50%;
+      color: #ffffff;
+      font-size: 16px;
+      user-select: none;
+      /* border-right: 1px solid #4d4b4b; */
+      scrollbar-width: none;
+
+    }
+
+    #editorInput,
+    #editorPreview {
+      background-color: #181a1b;
+      box-sizing: border-box;
+      height: 97vh;
+    }
+
+    #editorInput::first-line {
+      margin-top: 10px;
+    }
+
+    #editorPreview {
+      color: white;
+      flex: 1;
+      font-size: 16px;
+      overflow: auto;
+      word-wrap: break-word;
+      border-left: 1px solid #4d4b4b;
+      padding-left: 5px;
+      scrollbar-width: none;
+    }
+
+    #editorPreview>p {
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    #lineCounter {
+      height: 97vh;
+      display: flex;
+      border-color: transparent;
+      overflow-y: hidden;
+      text-align: right;
+      box-shadow: none;
+      color: #707070;
+      background-color: #101113;
+      position: absolute;
+      width: 2.7rem;
+      user-select: 0;
+    }
+
+    #editorPreview img {
+      max-width: 30vw;
+    }
+
+    #editorInput:focus {
+      outline: none;
+    }
+
+    #submit {
+      font-size: 2.7vh;
+      background-color: #101113;
+      height: 3vh;
+      color: white;
+    }
+
+    @media screen and (max-width: 1080px) {
+      #lineCounter {
+        width: 25px;
+      }
+
+      #editorPreview, #editorInput {
+        border-left: none;
+        border-right: none;
+      }
+
+      #editorPreview {
+        height: 100vh;
+        overflow: visible;
+      }
+
+      #editorContainer {
+        display: inline-block;
+      }
+
+      #editorInput {
+        border-bottom: 1px solid #4d4b4b;
+        width: 100vw;
+        padding-left: 28px;
+      }
+    }
+    </style>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+</head>
+
+<body>
+  <!-- <div id="line"></div> -->
+  <div id="submit">
+    <form>
+      <label for="form1_title">Title:</label>
+      <input type="text" id="form1_title" name="form1_title" required>
+      <label for="form1_description">Description:</label>
+      <input type="text" id="form1_description" name="form1_description" required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <div id="editorContainer">
+    <textarea id='lineCounter' wrap='off' readonly>1.</textarea>
+    <textarea id='editorInput' wrap='off'></textarea>
+    <div id="editorPreview"></div>
+  </div>
+  <script>
+    const converter = new showdown.Converter({ simpleLineBreaks: true });
+    const editorInput = document.getElementById('editorInput');
+    const lineCounter = document.getElementById('lineCounter');
+
+    let lineCountCache = 0;
+    function line_counter() {
+      let lineCount = editorInput.value.split('\n').length;
+      let outarr = new Array();
+      if (lineCountCache != lineCount) {
+        for (let x = 0; x < lineCount; x++) {
+          outarr[x] = (x + 1) + '.';
+        }
+        lineCounter.value = outarr.join('\n');
+      }
+      lineCountCache = lineCount;
+    }
+
+    editorInput.addEventListener('scroll', () => {
+      lineCounter.scrollTop = editorInput.scrollTop;
+      lineCounter.scrollLeft = editorInput.scrollLeft;
+    });
+
+    editorInput.addEventListener('input', () => {
+      localStorage.setItem("markdownEditorContent", editorInput.value);
+      editorPreview.innerHTML = converter.makeHtml(editorInput.value);
+      line_counter();
+    });
+
+    editorInput.addEventListener('keydown', (e) => {
+      let { keyCode } = e;
+      let { value, selectionStart, selectionEnd } = editorInput;
+
+      if (keyCode === 9) {  // TAB = 9
+        e.preventDefault();
+        editorInput.value = value.slice(0, selectionStart) + '\t' + value.slice(selectionEnd);
+        editorInput.setSelectionRange(selectionStart + 2, selectionStart + 1)
+      }
+    });
+
+    const savedContent = localStorage.getItem("markdownEditorContent");
+    if (savedContent) {
+      editorInput.value = savedContent;
+      editorPreview.innerHTML = converter.makeHtml(savedContent);
+    }
+    line_counter();
+  </script>
+</body>
+
+</html>

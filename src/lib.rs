@@ -1,7 +1,6 @@
 use worker::*;
-mod asset;
+mod content;
 mod utils;
-mod blog;
 
 // fn log_request(req: &Request) {
 //   console_log!(
@@ -20,7 +19,7 @@ mod blog;
 pub async fn main(_req: Request, env: Env, _ctx: worker::Context) -> Result<Response> {
   utils::set_panic_hook();
   Router::new()
-    .get_async("/", |_req, _ctx| asset::serve(_req, _ctx))
-    .get_async("/:tttt", |_req, _ctx| asset::serve(_req, _ctx))
+    .get_async("/", |_req, _ctx| content::serve(_req, _ctx))
+    .get_async("/:tttt", |_req, _ctx| content::serve(_req, _ctx))
     .run(_req, env).await
 }

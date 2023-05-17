@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>Markdown Editor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+  <style>
+    /* General styles */
+    body {
+      background: #181a1b;
+      font-family: monospace;
+    }
+
+    /* Editor styles */
+    #editorContainer {
+      display: flex;
+      flex-direction: row;
+    }
+
+    #editorInput,
+    #editorPreview {
+      background-color: #1b1e1f;
+      box-sizing: border-box;
+      height: 750px;
+      color: #ffffff;
+      font-size: 16px;
+    }
+
+    #editorInput {
+      padding-left: calc(3rem);
+      width: 48%;
+      margin-right: 5px;
+    }
+
+    #editorInput::first-line {
+      margin-top: 10px;
+    }
+
+    #editorPreview {
+      margin-left: 5px;
+      flex: 1;
+      overflow: auto;
+      word-wrap: break-word;
+    }
+
+    #editorPreview > p {
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    #editorPreview img {
+      max-width: 30vw;
+    }
+
+    #editorInput:focus {
+      outline: none;
+    }
+
+    /* Form styles */
+    form {
+      display: flex;
+      margin-top: 20px;
+      align-items: flex-end;
+    }
+
+    form > * {
+      margin-right: 10px;
+    }
+
+    input[type="text"] {
+      padding: 5px;
+      font-size: 16px;
+      background-color: #1b1e1f;
+      color: #ffffff;
+      border: none;
+      border-bottom: 1px solid #ffffff;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+    }
+
+    button[type="submit"] {
+      font-size: 16px;
+      background-color: #222627;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:focus,
+    button[type="submit"]:hover {
+      background-color: #1c8adb;
+    }
+  </style>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+</head>
+<body>
+  <div id="editorContainer">
+    <textarea id='lineCounter' wrap='off' readonly>1.</textarea>
+    <textarea id='editorInput' wrap='off'></textarea>
+    <div id="editorPreview"></div>
+  </div>
+  <form>
+    <label for="form1_title">Title:</label>
+    <input type="text" id="form1_title" name="form1_title" required>
+    <label for="form1_description">Description:</label>
+    <input type="text" id="form1_description" name="form1_description" required>
+    <button type="submit">Send</button>
+  </form>
+  <form>
+    <label for="form2_title">Title:</label>
+    <input type="text" id="form2_title" name="form2_title" required>
+    <label for="form2_description">Description:</label>
+    <input type="text" id="form2_description" name="form2_description" required>
+    <button type="submit">Send</button>
+  </form>
+  <script>
+    // Your JavaScript code here
+  </script>
+</body>
+</html>
