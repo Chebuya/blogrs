@@ -3,7 +3,7 @@ cloudflare-workers 2023-05-16 About cloudflare workers
 ![Workers](https://blog.cloudflare.com/content/images/2019/06/45DEDC7B-B31F-461C-B786-12FBAF1A5391.png)
 # What's about it?
 
-Recently i discovered awesome thing — Cloudflare. Cons — it's free, it can provide a free domain name, it has 1GB of storage for free, and it's freaking fast! And it can be written entirely in Rust.
+Recently i discovered awesome thing — Cloudflare Workers. Pros — it's free, it can provide a free domain name, it has 1GB of storage for free, and it's freaking fast! And it can be written entirely in Rust.
 [Native Rust support in workers](https://blog.cloudflare.com/workers-rust-sdk/)
 
 # How to start?
