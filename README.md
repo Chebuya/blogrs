@@ -1,3 +1,5 @@
 # Blog in cloudflare workers
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/worker-rust)
+My serverless home blog on rust
+
+![96eeeac5a4388987763702265b990abc5e86e178r1-506-508v2_00](https://github.com/Chebuya/blogrs/assets/28766913/201235df-c2bf-46f3-a18c-4529240db459)
