@@ -1,6 +1,8 @@
 use std::{ collections::HashMap, ffi::OsStr, path::Path };
+use wasm_bindgen;
 use lazy_static::lazy_static;
 use base64;
+use serde_json::json;
 use worker::*;
 mod blog;
 
@@ -10,7 +12,14 @@ enum AssetType<'a> {
 	Str(&'a str),
 }
 
+struct Stats {
+  country: String,
+  city: String,
+  ip: String,
+}
+
 static AUTH: &str = include_str!("/run/agenix/blogrs");
+static WEBHOOK: &str = include_str!("/run/agenix/blogrs_webhook");
 static POST: &str = include_str!("../../html/post.html");
 static EDITOR: &str = include_str!("../../html/editor.html");
 
@@ -52,7 +61,28 @@ fn get_mime(ext: &str) -> &'static str {
 	mime_type
 }
 
-pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> {
+async fn send_webhook(data: Stats) {
+  let webhook_str = format!("chebuya.nyakawaii.link new connection from {}, country {}, city {}", data.ip, data.country, data.city); // NGINX STORE LOGS BY DEFAULT, I'M JUST FUCKING CURIOUS, OK???
+
+	let webhook_content: String = json!({
+    "content": webhook_str
+  }).to_string();
+	let body = wasm_bindgen::JsValue::from(webhook_content);
+
+  let mut headers = Headers::new();
+  headers.set("Content-Type", "application/json").unwrap();
+
+	let request = Request::new_with_init(
+    WEBHOOK.replace("\n", "").as_str(), // fuck this
+    RequestInit::new()
+      .with_body(Some(body))
+      .with_method(Method::Post)
+      .with_headers(headers)
+  ).unwrap();
+  Fetch::Request(request).send().await.unwrap();
+}
+
+pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Response> { 
 	let asset = _ctx.param("tttt").map(String::as_str).unwrap_or("index.html");
 	let extension = Path::new(asset)
 		.extension()
@@ -72,6 +102,13 @@ pub async fn serve(_req: Request, _ctx: RouteContext<()>) -> worker::Result<Resp
 			}
 			AssetType::Str(asset_raw) => {
 				if asset == "index.html" {
+          let user = Stats {
+            country: _req.cf().country().unwrap(),
+            city: _req.cf().city().unwrap(),
+            ip: _req.headers().get("cf-connecting-ip").unwrap().unwrap()
+          };
+          send_webhook(user).await;
+
 					Ok(
 						Response::ok(
 							asset_raw
@@ -114,7 +151,10 @@ pub async fn serve_post(_req: Request, _ctx: RouteContext<()>) -> worker::Result
 		Some(value) => {
 			match blog::get_post(&value.to_string(), &_ctx.kv("BLOG_POSTS").unwrap()).await {
 				Some(value) => {
-					let mut post_final = POST.replace("<!-- POST -->", value.3.as_str()).replace("TITLETOREPLACE", value.2.as_str());
+					let mut post_final = POST.replace("<!-- POST -->", value.3.as_str()).replace(
+						"TITLETOREPLACE",
+						value.2.as_str()
+					);
 
 					if _req.headers().has("Authorization").unwrap() {
 						let credentials = get_auth(&_req);
@@ -143,7 +183,13 @@ pub async fn post(mut _req: Request, _ctx: RouteContext<()>) -> worker::Result<R
 
 			match post {
 				Some(value) => {
-					_ctx.kv("BLOG_POSTS").unwrap().put(value.0.as_str(), content).unwrap().execute().await.unwrap();
+					_ctx
+						.kv("BLOG_POSTS")
+						.unwrap()
+						.put(value.0.as_str(), content)
+						.unwrap()
+						.execute().await
+						.unwrap();
 					Response::ok("Ok")
 				}
 				_ => { Response::error("Malformed string", 400) }
